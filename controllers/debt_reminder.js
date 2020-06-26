@@ -47,13 +47,32 @@ exports.getById = async (req,res)=>{
             if(!resp) return Response.failure(res, { error: true, message: resp}, HttpStatus.NOT_FOUND)
             return Response.success(res, { error: false, message: resp})
         })
-        .catch(err => { return Response.failure(res, { error: true, message: err}, HttpStatus.INTERNAL_SERVER_ERROR) })
+        .catch(err => { return Response.failure(res, { error: true, message: err}, HttpStatus.INTERNAL_SERVER_ERROR)})
 }
 
 exports.updateById = async (req,res)=>{
-    
+    if(!req.params.transaction_id && !req.params.message && !req.params.status && !req.params.pay_date) return Response.failure(res, { error: true, message: "The following parameter "}, HttpStatus.NOT_FOUND)
+
+    debt.updateOne({ _id: req.params._id}, {
+        ts_ref_id: req.params.transaction_id,
+        message: req.params.message,
+        status: req.params.status,
+        expected_pay_date: req.params.pay_date
+    })
+    .then(resp => {
+        if(!resp) return Response.failure(res, { error: true, message: resp}, HttpStatus.NOT_FOUND)
+        return Response.success(res, { error: false, message: resp})
+    })
+    .catch(err => { return Response.failure(res, { error: true, message: err}, HttpStatus.INTERNAL_SERVER_ERROR)})
 }
 
 exports.deleteById = async (req,res)=>{
-    
+    if(!req.params.transaction_id ) return Response.failure(res, { error: true, message: "The following parameter "}, HttpStatus.NOT_FOUND)
+
+    debt.deleteOne({ _id: req.params.transaction_id })
+    .then(resp => {
+        if(!resp) return Response.failure(res, { error: true, message: resp}, HttpStatus.NOT_FOUND)
+        return Response.success(res, { error: false, message: resp})
+    })
+    .catch(err => { return Response.failure(res, { error: true, message: err}, HttpStatus.INTERNAL_SERVER_ERROR) })
 }
